@@ -17,6 +17,12 @@ SNES, スーパーファミコン(SFC)について、技術的な詳細を日本
 
 - [概要](video/README.md)
 
+## 関連するレポジトリ
+
+- [gb-docs-ja](https://github.com/pokemium/gb-docs-ja): GameBoyについて
+- [gba-docs-ja](https://github.com/pokemium/gba-docs-ja): GameBoy Advanceについて
+- [nds-docs-ja](https://github.com/pokemium/nds-docs-ja): Nintendo DSについて
+
 ## 参考記事
 
 - [SNES Development Wiki](https://wiki.superfamicom.org/)
