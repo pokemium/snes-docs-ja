@@ -1,5 +1,7 @@
 # 処理の流れ
 
+## `nall::main()`
+
 ルートの関数は`/bsnes/target-bsnes/bsnes.cpp`の`nall::main`関数です。
 
 ```c++
@@ -14,7 +16,7 @@ auto nall::main(Arguments arguments) -> void {
 }
 ```
 
-## `Program::create`
+## `Program::create()`
 
 `state().onMain`に`Program::main`をセットします。
 
@@ -37,7 +39,7 @@ auto Application::onMain(const function<void ()>& callback) -> void {
 }
 ```
 
-## `Application::run`
+## `Application::run()`
 
 `Program::create`で`state().onMain`にセットされた`Program::main`を呼び出してエミュレータのメインの処理に入ります。
 
@@ -199,7 +201,7 @@ auto CPU::power(bool reset) -> void {
 }
 ```
 
-よって、実質的なメイン処理は`CPU::Enter()`ということになります。
+よって、実質的なメイン処理は`CPU::Enter`ということになります。
 
 ## `CPU::Enter()`
 
@@ -240,6 +242,8 @@ auto CPU::main() -> void {
   status.interruptPending = 0;
 }
 ```
+
+`CPU::main`の`instruction()`で命令を1ステップ実行しています。
 
 ようやく命令を実行しているところにたどり着けました。
 
