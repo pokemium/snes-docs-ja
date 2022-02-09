@@ -44,7 +44,7 @@ PSR = Processor Status Register
   5  | M/U | Unused        (Always 1)                     (0=16bit, 1=8bit)
   6  | V   | Overflow      (0=No Overflow, 1=Overflow)
   7  | N   | Negative/Sign (0=Positive, 1=Negative)
-  -  | E   | 後述(0=16bit, 1=8bit)
+  --  | E   | 後述(0=16bit, 1=8bit)
 
 ### Emulation Flag (E)
 
