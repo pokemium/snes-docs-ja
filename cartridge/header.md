@@ -6,44 +6,58 @@ ROMイメージでは、ROMヘッダは、オフセット 007Fxxh (LoROM)、00FF
 
 もし`(imagesize AND 3FFh)=200h`の場合、つまり SWC/UFO/その他のコピー機からの追加ヘッダがある場合は、このオフセットに +200h を加えます。
 
-## カートリッジヘッダ (Area FFC0h..FFCFh)
+## カートリッジヘッダ
 
-```
-  FFC0h  カートリッジのタイトル(21バイト、大文字のAscii、余った部分はスペースでパディングされます)
-  FFC0h  タイトルの最初のバイト(頭文字、海賊版のXin1カートリッジでは 5Chのfarjumpオペコードが格納されます)
-  FFD4h  タイトルの最後のバイト (00h にすると初期型拡張ヘッダがあることを指示します)
-  FFD5h  Rom Makeup / ROM Speed and Map Mode (後述)
-  FFD6h  チップセット (カートリッジの基盤構成、後述)
-  FFD7h  ROM size (1 SHL n) Kbytes (usually 8=256KByte .. 0Ch=4MByte)
-          Values are rounded-up for carts with 10,12,20,24 Mbits
-  FFD8h  RAM size (1 SHL n) Kbytes (usually 1=2Kbyte .. 5=32Kbyte) (0=None)
-  FFD9h  製造地域コード (これによってPAL/NTSCも決まります) (後述)
-  FFDAh  製造元ID  (00h=不明/自作, 01h=Nintendo, etc.) (33h=New)
-  FFDBh  バージョン (0スタート、つまり v1.0 = 00h)
-  FFDCh  Checksum complement (same as below, XORed with FFFFh)
-  FFDEh  チェックサム (all bytes in ROM added together; assume [FFDC-F]=FF,FF,0,0)
-```
+カートリッジヘッダは`FFC0h..FFDFh`の32バイトです。
 
-## 拡張ヘッダ (Area FFB0h..FFBFh) (newer carts only)
+オフセット | サイズ | 内容
+-- | -- | --
+FFC0h | 21バイト | カートリッジのタイトル
+FFD5h | 1バイト | Rom Makeup / ROM Speed and Map Mode (後述)
+FFD6h | 1バイト | チップセット (カートリッジの基盤構成、後述)
+FFD7h | 1バイト | ROMサイズ(後述)
+FFD8h | 1バイト | RAMサイズ(後述)
+FFD9h | 1バイト | 製造地域コード(後述)
+FFDAh | 1バイト | 製造元ID  (00h=不明/自作, 01h=Nintendo, etc.) (33h=後期型拡張ヘッダが存在)
+FFDBh | 1バイト | バージョン (0スタート、つまり v1.0 = 00h)
+FFDCh | 2バイト | チェックサムの補数(チェックサムの16ビットの補数(ビット反転))
+FFDEh | 2バイト | チェックサム (all bytes in ROM added together; assume \[FFDC-F\]=FF,FF,0,0)
 
-### 初期型拡張ヘッダ (1993) (when [FFD4h]=00h; Last byte of Title=00h):
+注意: 
 
-```
-  FFB0h  予約領域 (15バイト, 全部0)
-  FFBFh  チップセットのサブタイプ (基本的に0、[FFD6h]=Fxhの場合のみ参照)
-```
+- ROMサイズは`[FFD7h]`の値が`n`とすると`(1 SHL n) KB`となります。
+    - 例えば、08hなら256KB、0Chなら4MBになります。
+    - 10,12,20,24 Mbitsのカートの場合、値は切り上げられます。
+- RAMサイズは`[FFD8h]`の値が`n`とすると`(1 SHL n) KB`となります。
+    - 例えば、01hなら2KB、05hなら32KBになります。
+    - 00hはRAMが搭載されていないカートリッジであることを示します。
 
-### 後期型拡張ヘッダ (1994) (when [FFDAh]=33h; Old Maker Code=33h):
+## 拡張ヘッダ
 
-```
-  FFB0h  製造元ID (ASCII2文字, 例: "01"=Nintendo)
-  FFB2h  ゲームコード  (ASCII4文字) (古いタイプはASCII2文字で20h,20hでパディングされています)
-  FFB6h  予約領域   (6バイト、全部0)
-  FFBCh  Expansion FLASH Size (1 SHL n) Kbytes (used in JRA PAT)
-  FFBDh  Expansion RAM Size (1 SHL n) Kbytes (in GSUn games) (without battery?)
-  FFBEh  Special Version      (usually zero) (eg. promotional version)
-  FFBFh  チップセットのサブタイプ (基本的に0、[FFD6h]=Fxhの場合のみ参照)
-```
+拡張ヘッダは、オフセット`FFB0h..FFBFh`に配置されており、比較的後に発売されたカートリッジに搭載されています。
+
+### 初期型拡張ヘッダ (1993):
+
+`[FFD4h]=00h`、つまりカートリッジのタイトルの最後が`00h`のときは初期型拡張ヘッダを利用しています。
+
+オフセット | サイズ | 内容
+-- | -- | --
+FFB0h | 15バイト | 予約領域(全部0)
+FFBFh | 1バイト | チップセットのサブタイプ (基本的に0、\[FFD6h\]=Fxhの場合のみ参照)
+
+### 後期型拡張ヘッダ (1994):
+
+`[FFDAh]=33h`、つまり製造元IDが`33h`のときは後期型拡張ヘッダを利用しています。
+
+オフセット | サイズ | 内容
+-- | -- | --
+FFB0h | 2バイト | 製造元ID(ASCII2文字, 例: "01"=Nintendo)
+FFB2h | 4バイト | ゲームコード  (ASCII4文字) (古いタイプはASCII2文字で20h,20hでパディングされています)
+FFB6h | 6バイト | 予約領域(全部0)
+FFBCh | 1バイト | Expansion FLASH Size (1 SHL n) Kbytes (used in JRA PAT)
+FFBDh | 1バイト | Expansion RAM Size (1 SHL n) Kbytes (in GSUn games) (without battery?)
+FFBEh | 1バイト | Special Version(usually zero) (eg. promotional version)
+FFBFh | 1バイト | チップセットのサブタイプ (基本的に0、\[FFD6h\]=Fxhの場合のみ参照)
 
 注意: 初期型拡張ヘッダは ST010/11 ゲーム で飲み使われていました。
 
@@ -60,7 +74,9 @@ The BS-X Satellaview FLASH Card Files, and Sufami Turbo Mini-Cartridges are usin
 
 Homebrew games (and copiers & cheat devices) are usually having several errors in the cartridge header (usually no checksum, zero-padded title, etc), they should (hopefully) contain valid entryoints in range 8000h..FFFEh. Many Copiers are using 8Kbyte ROM bank(s) - in that special case the exception vectors are located at offset 1Fxxh within the ROM-image.
 
-## 例外ベクタ (Area FFE0h..FFFFh)
+## 例外ベクタ
+
+例外ベクタはオフセット`FFE0h..FFFFh`に配置されています。
 
 ```
   FFE0h  Zerofilled (or ID "XBOO" for WRAM-Boot compatible files)
@@ -81,7 +97,7 @@ Homebrew games (and copiers & cheat devices) are usually having several errors i
 
 Note: Exception Vectors are variable in SA-1 and CX4, and fixed in GSU.
 
-## Text Fields
+## テキストフィールド
 
 The ASCII fields can use chr(20h..7Eh), actually they are JIS (with Yen instead backslash).
 
@@ -126,17 +142,12 @@ Homebrew files often contain 0000h,0000h or FFFFh,0000h as checksum value.
   Bit5   常に1 (maybe meant to be MSB of bit4, for "2" and "3" MHz)
   Bit4   Speed (0=Slow, 1=Fast)              (Slow 200ns, Fast 120ns)
   Bit3-0 Map Mode
-```
-
-Map Mode can be:
-
-```
-  0=LoROM/32K Banks             Mode 20 (LoROM)
-  1=HiROM/64K Banks             Mode 21 (HiROM)
-  2=LoROM/32K Banks + S-DD1     Mode 22 (mappable) "Super MMC"
-  3=LoROM/32K Banks + SA-1      Mode 23 (mappable) "Emulates Super MMC"
-  5=HiROM/64K Banks             Mode 25 (ExHiROM)
-  A=HiROM/64K Banks + SPC7110   Mode 25? (mappable)
+        0=LoROM/32K Banks             Mode 20 (LoROM)
+        1=HiROM/64K Banks             Mode 21 (HiROM)
+        2=LoROM/32K Banks + S-DD1     Mode 22 (mappable) "Super MMC"
+        3=LoROM/32K Banks + SA-1      Mode 23 (mappable) "Emulates Super MMC"
+        5=HiROM/64K Banks             Mode 25 (ExHiROM)
+        A=HiROM/64K Banks + SPC7110   Mode 25? (mappable)
 ```
 
 Note: ExHiROM is used only by "Dai Kaiju Monogatari 2 (JP)" and "Tales of Phantasia (JP)".
