@@ -2,7 +2,9 @@
 
 カートリッジのヘッダは、SNESのメモリでは00FFxxh(例外ベクタの近く)にマッピングされています。
 
-ROMイメージでは、ROMヘッダは、オフセット 007Fxxh (LoROM)、00FFxxh (HiROM)、または 40FFxxh (ExHiROM) にあります。
+実際のハードウェア上でゲームを実行するためには必要ありませんが、カートリッジヘッダは任天堂の承認プロセスで検証のために使用され、SNESエミュレータでもメモリレイアウトやROMタイプを識別して決定するために使用されます。
+
+ROMイメージでは、ROMヘッダは、オフセット `0x7Fxx (LoROM)`、`0xFFxx (HiROM)`、または `0x40_FFxx (ExHiROM)` にあります。
 
 もし`(imagesize AND 3FFh)=200h`の場合、つまり SWC/UFO/その他のコピー機からの追加ヘッダがある場合は、このオフセットに +200h を加えます。
 
@@ -69,14 +71,14 @@ FFBFh | 1バイト | チップセットのサブタイプ (基本的に0、\[FFD
 
 The BS-X Satellaview FLASH Card Files, and Sufami Turbo Mini-Cartridges are using similar looking (but not fully identical) headers (and usually the same .SMC file extension) than normal ROM cartridges. Detecting the content of .SMC files can be done by examining ID Strings (Sufami Turbo), or differently calculated checksum values (Satellaview). For details, see:
 
-[SNES Cart Satellaview (satellite receiver & mini flashcard)](https://problemkaputt.github.io/fullsnes.htm#snescartsatellaviewsatellitereceiverminiflashcard)
-[SNES Cart Sufami Turbo (Mini Cartridge Adaptor)](https://problemkaputt.github.io/fullsnes.htm#snescartsufamiturbominicartridgeadaptor)
+- [SNES Cart Satellaview (satellite receiver & mini flashcard)](https://problemkaputt.github.io/fullsnes.htm#snescartsatellaviewsatellitereceiverminiflashcard)
+- [SNES Cart Sufami Turbo (Mini Cartridge Adaptor)](https://problemkaputt.github.io/fullsnes.htm#snescartsufamiturbominicartridgeadaptor)
 
 Homebrew games (and copiers & cheat devices) are usually having several errors in the cartridge header (usually no checksum, zero-padded title, etc), they should (hopefully) contain valid entryoints in range 8000h..FFFEh. Many Copiers are using 8Kbyte ROM bank(s) - in that special case the exception vectors are located at offset 1Fxxh within the ROM-image.
 
 ## 例外ベクタ
 
-例外ベクタはオフセット`FFE0h..FFFFh`に配置されています。
+例外ベクタはオフセット`FFE0h..FFFFh`に配置されています。例外ベクタは、SNESのCPUが割り込み発生時にどこを実行するかを決定するために使用されています。
 
 ```
   FFE0h  Zerofilled (or ID "XBOO" for WRAM-Boot compatible files)
