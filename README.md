@@ -13,6 +13,11 @@ SNES, スーパーファミコン(SFC)について、技術的な詳細を日本
 - [仕様](spec.md)
 - [米国版スーファミとの違い](sfc_snes.md)
 
+### CPU
+
+- [レジスタ](65xx/register.md)
+- [アドレッシング](65xx/addressing.md)
+
 ### グラフィック
 
 - [概要](video/README.md)
