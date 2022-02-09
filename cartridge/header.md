@@ -238,7 +238,6 @@ Note: ExHiROM is used only by "Dai Kaiju Monogatari 2 (JP)" and "Tales of Phanta
 13h | Y | その他 | ?
 14h | Z | その他 | ?
 
-
 FFD9hの項目は、`[FFD9h]`の値とゲームコードの4文字目を表しています。(製造地域コードが決まると`[FFD9h]`とゲームコードの4文字目が一意に定まるものがある)
 
 ## ゲームコード (FFB2h)
