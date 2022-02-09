@@ -31,6 +31,7 @@ SNES, スーパーファミコン(SFC)について、技術的な詳細を日本
 #### コードリーディング
 
 - [bsnes-emu/bsnes](others/bsnes/README.md)
+- [snes9xgit/snes9x](others/snes9x/README.md)
 
 ## 関連するレポジトリ
 
