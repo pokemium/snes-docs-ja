@@ -12,6 +12,7 @@ SNES, スーパーファミコン(SFC)について、技術的な詳細を日本
 
 - [仕様](spec.md)
 - [米国版スーファミとの違い](sfc_snes.md)
+- [メモリマップ](memory/map.md)
 
 ### CPU
 
@@ -19,6 +20,11 @@ SNES, スーパーファミコン(SFC)について、技術的な詳細を日本
 - [アドレッシング](65xx/addressing.md)
 - [データ転送命令](65xx/transfer.md)
 - [ALU](65xx/alu.md)
+
+### メモリ
+
+- [メモリマップ](memory/map.md)
+- [制御レジスタ](memory/control.md)
 
 ### グラフィック
 
