@@ -1,12 +1,12 @@
 # [カートリッジヘッダ](https://problemkaputt.de/fullsnes.htm#snescartridgeromheader)
 
-カートリッジのヘッダは、SNESのメモリでは00FFxxh(例外ベクタの近く)にマッピングされています。
+カートリッジヘッダは、SNESのメモリでは`0x00_FFxxh`(例外ベクタの近く)にマッピングされています。
 
-実際のハードウェア上でゲームを実行するためには必要ありませんが、カートリッジヘッダは任天堂の承認プロセスで検証のために使用され、SNESエミュレータでもメモリレイアウトやROMタイプを識別して決定するために使用されます。
+実際のハードウェア上でゲームを実行するためには必要ありませんが、カートリッジヘッダは任天堂の承認プロセスで検証のために使用され、SNESエミュレータでもメモリレイアウトやROMタイプを識別するために使用されます。
 
-ROMイメージでは、ROMヘッダは、オフセット `0x7Fxx (LoROM)`、`0xFFxx (HiROM)`、または `0x40_FFxx (ExHiROM)` にあります。
+ROMイメージでは、ROMヘッダは、オフセット `0x00_7Fxx (LoROM)`、`0x00_FFxx (HiROM)`、または `0x40_FFxx (ExHiROM)` にあります。
 
-もし`(imagesize AND 3FFh)=200h`の場合、つまり SWC/UFO/その他のコピー機からの追加ヘッダがある場合は、このオフセットに +200h を加えます。
+もし`(imagesize AND 3FFh)=200h`の場合、つまり SWC/UFO/その他のコピー機からの追加ヘッダがある場合は、このオフセットに `+200h` を加えます。
 
 ## カートリッジヘッダ
 
@@ -137,19 +137,23 @@ On-chip ROM contained in external CPUs (DSPn,ST01n,CX4) is NOT counted in the RO
 
 Homebrew files often contain 0000h,0000h or FFFFh,0000h as checksum value.
 
-## ROM Speed and Map Mode (FFD5h)
+## 動作速度,マッピングモード (FFD5h)
+
+bit | 内容 | 備考
+---- | ---- | ---- 
+bit0-3 | マッピングモード | 後述
+bit4 | 動作速度 | 0=Slow(200ns), 1=Fast(120ns)
+bit5 | 1 | bit4とbit5の2bitでROMの動作クロック(2 or 3)を表していると思われる
+bit6-7 | 0 | --
 
 ```
-  Bit7-6 常に0
-  Bit5   常に1 (maybe meant to be MSB of bit4, for "2" and "3" MHz)
-  Bit4   Speed (0=Slow, 1=Fast)              (Slow 200ns, Fast 120ns)
-  Bit3-0 Map Mode
-        0=LoROM/32K Banks             Mode 20 (LoROM)
-        1=HiROM/64K Banks             Mode 21 (HiROM)
-        2=LoROM/32K Banks + S-DD1     Mode 22 (mappable) "Super MMC"
-        3=LoROM/32K Banks + SA-1      Mode 23 (mappable) "Emulates Super MMC"
-        5=HiROM/64K Banks             Mode 25 (ExHiROM)
-        A=HiROM/64K Banks + SPC7110   Mode 25? (mappable)
+マッピングモード(bit0-3):
+  0=LoROM/32K Banks             Mode 20 (LoROM)
+  1=HiROM/64K Banks             Mode 21 (HiROM)
+  2=LoROM/32K Banks + S-DD1     Mode 22 (mappable) "Super MMC"
+  3=LoROM/32K Banks + SA-1      Mode 23 (mappable) "Emulates Super MMC"
+  5=HiROM/64K Banks             Mode 25 (ExHiROM)
+  A=HiROM/64K Banks + SPC7110   Mode 25? (mappable)
 ```
 
 Note: ExHiROM is used only by "Dai Kaiju Monogatari 2 (JP)" and "Tales of Phantasia (JP)".
