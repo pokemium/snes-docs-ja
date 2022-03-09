@@ -35,19 +35,21 @@ CPUのアドレス空間にマッピングされていない、I/Oを通して�
 
 ## システム領域(バンク: 00-3Fh, 80-BFh)
 
+`0x00xxxx..3Fxxxx`, `0x80xxxx-BFxxxx`部分です。(`xxxx=0000..7FFFh`)
+
 オフセット | 内容 | 動作速度
 -- | -- | --
-0000h-1FFFh | Mirror of 7E0000h-7E1FFFh (first 8Kbyte of WRAM) | 2.68MHz
-2000h-20FFh | 不使用                                           | 3.58MHz
-2100h-21FFh | I/Oポート (B-Bus)                                | 3.58MHz
-2200h-3FFFh | 不使用                                           | 3.58MHz
-4000h-41FFh | I/Oポート (manual joypad access)                 | 1.78MHz
-4200h-5FFFh | I/Oポート                                        | 3.58MHz
-6000h-7FFFh | Expansion                                        | 2.68MHz
+0000h-1FFFh | 7E0000h-7E1FFFh(WRAMの先頭8KB)のミラー | 2.68MHz
+2000h-20FFh | 不使用                                | 3.58MHz
+2100h-21FFh | I/Oポート (B-Bus)                     | 3.58MHz
+2200h-3FFFh | 不使用                                | 3.58MHz
+4000h-41FFh | I/Oポート (manual joypad access)      | 1.78MHz
+4200h-5FFFh | I/Oポート                             | 3.58MHz
+6000h-7FFFh | Expansion                            | 2.68MHz
 
 ## カートリッジ容量
 
-24bitのアドレスバスで16MBのアドレスが可能だが、広い部分はWRAMやI/Oミラーで占められており、WS1/WS2のLoROM/HiROM領域のカートリッジROMは約11.9MBしか残っていません。（Expansion領域やI/O領域の隙間も利用すれば、もうちょっと利用可能です）
+24bitのアドレスバスで16MBのアドレスが可能ですが、かなりの部分がWRAMやI/Oのミラー領域で占められており、WS1/WS2のLoROM/HiROM領域のカートリッジROMは約11.9MBしか残っていません。（Expansion領域やI/O領域の隙間も利用すれば、もうちょっと利用可能です）
 
 ほとんどのカートリッジでは、WS1とWS2は鏡のようになっていて、ほとんどのゲームはLoROMのみ、またはHiROMのみの領域を使用するため、以下のような容量になります。
 
