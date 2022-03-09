@@ -19,20 +19,23 @@ Absolute,Y   | nnnn,Y | \[nnnn+Y\]
 
 `[nn]`,`[nn+X]`,`[nn+Y]`
 
-Uses an 8bit parameter (one byte) to address the first 256 of memory at `0000h..00FFh`. This limited range is used even for "nn+X" and "nn+Y", ie. "C0h+60h" will access 0020h (not 0120h).
+8bitのパラメータ(1バイト)を使って、メモリの最初の256バイト`0000h...00FFh`(=ゼロページ)内のアドレスを指定します。
+
+この範囲は、`nn+X` や `nn+Y` のアドレス指定でも使用されます。例えば、`C0h+60h`は、`0120h`となりますが、ゼロページの範囲外であり、実際には`0020h`(`=0x0120&0xff`)にアクセスすることになります。
 
 ### 絶対アドレス
 
 `[nnnn]`,`[nnnn+X]`,`[nnnn+Y]`
 
-Uses a 16bit parameter (two bytes) to address the whole 64K of memory at `0000h..FFFFh`. Because of the additional parameter bytes, this is a bit slower than Zero Page accesses.
+16bitのパラメータ（2バイト）を使って、64KBのメモリ空間`0000h...FFFFh`のアドレスのどこかを指定します。パラメータとして余計に1バイト追加されるため、ゼロページアドレッシングを使ったアクセスより少し遅くなります。
 
-### Indirect
+### 間接アドレッシング
 
 `[[nn+X]]`,`[[nn+Y]]`
 
-Uses an 8bit parameter that points to a 16bit parameter in page zero.
-Even though the CPU doesn't support 16bit registers (except for the program counter), this (double-)indirect addressing mode allows to use variable 16bit pointers.
+ページゼロの16bitパラメータを指し示す8bitパラメータを使用します。
+
+SNESは（プログラムカウンタを除いて）CPUが16bitレジスタをサポートしていないですが、この（二重）間接アドレッシングモードによって、可変16bitポインタを使用することができます。
 
 ### On-Chip Bi-directional I/O port
 

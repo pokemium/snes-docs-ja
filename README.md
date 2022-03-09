@@ -20,6 +20,7 @@ SNES, スーパーファミコン(SFC)について、技術的な詳細を日本
 - [アドレッシング](65xx/addressing.md)
 - [データ転送命令](65xx/transfer.md)
 - [ALU](65xx/alu.md)
+- [回転・シフト命令](65xx/rotate_shift.md)
 
 ### メモリ
 
