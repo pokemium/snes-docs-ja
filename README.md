@@ -26,6 +26,7 @@ SNES, スーパーファミコン(SFC)について、技術的な詳細を日本
 
 - [メモリマップ](memory/map.md)
 - [制御レジスタ](memory/control.md)
+- [WRAMへのレジスタ経由のアクセス](memory/wram.md)
 
 ### グラフィック
 
