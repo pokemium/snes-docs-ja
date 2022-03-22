@@ -1,0 +1,69 @@
+# ジャンプ命令
+
+## 無条件ジャンプ
+
+オペコード | フラグ | サイクル | Native | Nocash | 内容
+-- | -- | -- | -- | -- | -- 
+80 dd       | ------ | 3xx | BRA disp8    | JMP disp      | PC=PC+/-disp8
+82 dd dd    | ------ | 4   | BRL disp16   | JMP disp      | PC=PC+/-disp16
+4C nn nn    | ------ | 3   | JMP nnnn     | JMP nnnn      | PC=nnnn
+5C nn nn nn | ------ | 4   | JMP nnnnnn   | JMP nnnnnn    | PB:PC=nnnnnn
+6C nn nn    | ------ | 5   | JMP (nnnn)   | JMP \[nnnn\]    | PC=WORD\[00:nnnn\]
+7C nn nn    | ------ | 6   | JMP (nnnn,X) | JMP \[nnnn+X\]  | PC=WORD\[PB:nnnn+X\]
+DC nn nn    | ------ | 6   | JML ...      | JMP FAR\[nnnn\] | PB:PC=\[00:nnnn\]
+20 nn nn    | ------ | 6   | JSR nnnn     | CALL nnnn     | \[S\]=PC+2,PC=nnnn
+22 nn nn nn | ------ | 4   | JSL nnnnnn   | CALL nnnnnn   | PB:PC=nnnnnn \[S\]=PB:PC+3
+FC nn nn    | ------ | 6   | JSR (nnnn,X) | CALL \[nnnn+X\] | PC=WORD\[PB:nnnn+X\] \[S\]=PC
+40          | nzcidv | 6   | RTI          | RETI          | P=\[S+1\],PB:PC=\[S+2\],S=S+4
+6B          | ------ | ?   | RTL          | RETF          | PB:PC=\[S+1\]+1, S=S+3
+60          | ------ | 6   | RTS          | RET           | PC=\[S+1\]+1, S=S+2
+
+Note: RTIは、Bフラグおよび不使用フラグを変更することはできません。
+
+Glitch: For `JMP [nnnn]` the operand word cannot cross page boundaries, ie. `JMP [03FFh]` would fetch the MSB from `[0300h]` instead of `[0400h]`. Very simple workaround would be to place a ALIGN 2 before the data word.
+
+## 条件付きジャンプ
+
+オペコード | フラグ | サイクル | Native | Nocash | 条件
+-- | -- | -- | -- | -- | -- 
+10 dd | ------ | 2** | BPL     | JNS     disp  | `N=0` (plus/positive)
+30 dd | ------ | 2** | BMI     | JS      disp  | `N=1` (minus/negative/signed)
+50 dd | ------ | 2** | BVC     | JNO     disp  | `V=0` (no overflow)
+70 dd | ------ | 2** | BVS     | JO      disp  | `V=1` (overflow)
+90 dd | ------ | 2** | BCC/BLT | JNC/JB  disp  | `C=0` (less/below/no carry)
+B0 dd | ------ | 2** | BCS/BGE | JC/JAE  disp  | `C=1` (above/greater/equal/carry)
+D0 dd | ------ | 2** | BNE/BZC | JNZ/JNE disp  | `Z=0` (not zero/not equal)
+F0 dd | ------ | 2** | BEQ/BZS | JZ/JE   disp  | `Z=1` (zero/equal)
+
+** The execution time is 2 cycles if the condition is false (no branch executed). Otherwise, 3 cycles if the destination is in the same memory page, or 4 cycles if it crosses a page boundary (see below for exact info).
+
+Note: x86やZ80のCPUとは異なり、減算（SBCやCMP）は以下(`A-B`として、`A >= B`)のときに`carry=set`となります。
+
+## 割り込み、例外、ブレーク
+
+```
+  Opcode                                                      6502     65C816
+  00   BRK    Break      B=1 [S]=$+2,[S]=P,D=0 I=1, PB=00, PC=[00FFFE] [00FFE6]
+  02   COP    ;65C816    B=1 [S]=$+2,[S]=P,D=0 I=1, PB=00, PC=[00FFF4] [00FFE4]
+  --   /ABORT ;65C816                               PB=00, PC=[00FFF8] [00FFE8]
+  --   /IRQ   Interrupt  B=0 [S]=PC, [S]=P,D=0 I=1, PB=00, PC=[00FFFE] [00FFEE]
+  --   /NMI   NMI        B=0 [S]=PC, [S]=P,D=0 I=1, PB=00, PC=[00FFFA] [00FFEA]
+  --   /RESET Reset      D=0 E=1 I=1 D=0000, DB=00  PB=00, PC=[00FFFC] N/A
+```
+
+IRQはIフラグで無効にできますが、`BRK`，`/NMI`，`/RESET`信号はIフラグで無効にすることはできません。
+
+Exceptions do first change the B-flag (in 6502 mode), then write P to stack, and then set the I-flag, the D-flag IS cleared (unlike as on original 6502).
+
+6502モードでは、BRKとIRQは同じベクタを共有しており、ソフトウェアはプッシュされたBフラグのみを調べることで、BRKとIRQを見分けることができます。
+
+The RTI opcode can be used to return from BRK/IRQ/NMI, note that using the return address from BRK skips one dummy/parameter byte following after the BRK opcode.
+
+ソフトウェアまたはハードウェアは、`/IRQ`または`/NMI`信号を処理した後、アクノリッジまたはリセットを行うよう注意する必要があります。
+
+```
+IRQs are executed whenever "/IRQ=LOW AND I=0".
+NMIs are executed whenever "/NMI changes from HIGH to LOW".
+```
+
+`/IRQ`をLOWにした場合、`I=0`にするとすぐに同じ（古い）割り込みが再度実行されます。 `/NMI`をLOWにした場合、それ以上NMIを実行することはできません。
