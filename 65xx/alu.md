@@ -87,4 +87,18 @@ CA       | nz---- | 2 | DEX        | DEC X        | X=X-1
 
 ## TSB/TRB (Test and Set/Reset)
 
-TODO
+オペコード | サイクル | Native | Nocash
+-- | -- | -- | --
+04 nn    | -z---- | 5 | TSB nn   | SET \[nn\],A  
+0C nn nn | -z---- | 6 | TSB nnnn | SET \[nnnn\],A
+14 nn    | -z---- | 5 | TRB nn   | CLR \[nn\],A  
+1C nn nn | -z---- | 6 | TRB nnnn | CLR \[nnnn\],A
+
+```
+TSB:
+    "TEST op,A" --> z
+    then "OR op,A"
+CLR:
+    "TEST op,A" --> z
+    then "AND op,NOT A"
+```
