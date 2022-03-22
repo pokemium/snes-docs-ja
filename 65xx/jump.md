@@ -18,7 +18,9 @@ FC nn nn    | ------ | 6   | JSR (nnnn,X) | CALL \[nnnn+X\] | PC=WORD\[PB:nnnn+X
 6B          | ------ | ?   | RTL          | RETF          | PB:PC=\[S+1\]+1, S=S+3
 60          | ------ | 6   | RTS          | RET           | PC=\[S+1\]+1, S=S+2
 
+<pre>
 Note: RTIは、Bフラグおよび不使用フラグを変更することはできません。
+</pre>
 
 Glitch: For `JMP [nnnn]` the operand word cannot cross page boundaries, ie. `JMP [03FFh]` would fetch the MSB from `[0300h]` instead of `[0400h]`. Very simple workaround would be to place a ALIGN 2 before the data word.
 
@@ -26,18 +28,20 @@ Glitch: For `JMP [nnnn]` the operand word cannot cross page boundaries, ie. `JMP
 
 オペコード | フラグ | サイクル | Native | Nocash | 条件
 -- | -- | -- | -- | -- | -- 
-10 dd | ------ | 2** | BPL     | JNS     disp  | `N=0` (plus/positive)
-30 dd | ------ | 2** | BMI     | JS      disp  | `N=1` (minus/negative/signed)
-50 dd | ------ | 2** | BVC     | JNO     disp  | `V=0` (no overflow)
-70 dd | ------ | 2** | BVS     | JO      disp  | `V=1` (overflow)
-90 dd | ------ | 2** | BCC/BLT | JNC/JB  disp  | `C=0` (less/below/no carry)
-B0 dd | ------ | 2** | BCS/BGE | JC/JAE  disp  | `C=1` (above/greater/equal/carry)
-D0 dd | ------ | 2** | BNE/BZC | JNZ/JNE disp  | `Z=0` (not zero/not equal)
-F0 dd | ------ | 2** | BEQ/BZS | JZ/JE   disp  | `Z=1` (zero/equal)
+10 dd | ------ | 2<sup>[1](#cycle)</sup> | BPL     | JNS     disp  | `N=0` (plus/positive)
+30 dd | ------ | 2<sup>[1](#cycle)</sup> | BMI     | JS      disp  | `N=1` (minus/negative/signed)
+50 dd | ------ | 2<sup>[1](#cycle)</sup> | BVC     | JNO     disp  | `V=0` (no overflow)
+70 dd | ------ | 2<sup>[1](#cycle)</sup> | BVS     | JO      disp  | `V=1` (overflow)
+90 dd | ------ | 2<sup>[1](#cycle)</sup> | BCC/BLT | JNC/JB  disp  | `C=0` (less/below/no carry)
+B0 dd | ------ | 2<sup>[1](#cycle)</sup> | BCS/BGE | JC/JAE  disp  | `C=1` (above/greater/equal/carry)
+D0 dd | ------ | 2<sup>[1](#cycle)</sup> | BNE/BZC | JNZ/JNE disp  | `Z=0` (not zero/not equal)
+F0 dd | ------ | 2<sup>[1](#cycle)</sup> | BEQ/BZS | JZ/JE   disp  | `Z=1` (zero/equal)
 
-** The execution time is 2 cycles if the condition is false (no branch executed). Otherwise, 3 cycles if the destination is in the same memory page, or 4 cycles if it crosses a page boundary (see below for exact info).
+<sup id="cycle">1: 実行時間は、条件が偽の場合（分岐が実行されない）、2サイクルです。それ以外の場合は、ジャンプ先が同じメモリページ内にある場合は3サイクル、ページ境界を越える場合は4サイクルです。</sup>
 
+<pre>
 Note: x86やZ80のCPUとは異なり、減算（SBCやCMP）は以下(`A-B`として、`A >= B`)のときに`carry=set`となります。
+</pre>
 
 ## 割り込み、例外、ブレーク
 
@@ -53,7 +57,7 @@ Note: x86やZ80のCPUとは異なり、減算（SBCやCMP）は以下(`A-B`と�
 
 IRQはIフラグで無効にできますが、`BRK`，`/NMI`，`/RESET`信号はIフラグで無効にすることはできません。
 
-Exceptions do first change the B-flag (in 6502 mode), then write P to stack, and then set the I-flag, the D-flag IS cleared (unlike as on original 6502).
+例外(Exception)時は、まずBフラグが変更され（6502モードのとき）、次に`P`をスタックに書き込んだあと、Iフラグをセットし、Dフラグがクリアされます（オリジナルの6502とは異なります）。
 
 6502モードでは、BRKとIRQは同じベクタを共有しており、ソフトウェアはプッシュされたBフラグのみを調べることで、BRKとIRQを見分けることができます。
 
