@@ -34,6 +34,8 @@ SNES, スーパーファミコン(SFC)について、技術的な詳細を日本
 ### グラフィック
 
 - [概要](video/README.md)
+- [VRAM](video/VRAM.md)
+    - [VRAMへのレジスタ経由のアクセス](memory/vram.md)
 
 ### カートリッジ
 
